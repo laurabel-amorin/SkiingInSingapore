@@ -59,7 +59,11 @@ namespace Map
             currentMapPath.Length++;
             foreach (var viableNeighbour in viableNeighbours)
             {
-                var path = currentMapPath;
+                var path = new MapPath
+                {
+                    Start = currentMapPath.Start,
+                    Length = currentMapPath.Length
+                };
                 EvaluatePath(viableNeighbour, path);
             }
         }

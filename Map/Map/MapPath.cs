@@ -10,7 +10,7 @@ namespace Map
     {
         public Locale Start { get; set; }= new Locale();
         public Locale End { get; set; }= new Locale();
-        public int Length { get; set; }
+        public int Length { get; set; } = 1;
         public int VerticalDrop => Start.Value - End.Value;
     }
 }
