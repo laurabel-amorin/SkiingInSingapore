@@ -14,7 +14,7 @@ namespace Map
         {
             string directory = Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory()));
             string text = File.ReadAllText(directory+@"\map.txt");
-            var map = new SquareMap(text, 1000);
+            var map = new SquareMap(text, 4);
             Console.WriteLine($"You have successfully created a {map.SideLength}x{map.SideLength} square map");
 
             List<int> encounteredIndices = new List<int>();

@@ -52,12 +52,12 @@ namespace Map
 
         public int GetMapRow(int index)
         {
-            return index /SideLength;
+            return (index /SideLength)+1;
         }
 
         public int GetMapColumn(int index)
         {
-            return index % SideLength;
+            return (index % SideLength)+1;
         }
 
 
