@@ -7,7 +7,7 @@ namespace Map
     class GridMapEvaluator
     {
         private MapPath BestMapPath { get; set; }= new MapPath();
-        private Dictionary<int, MapPath> bestLocalePaths= new Dictionary<int, MapPath>();
+        private Dictionary<int, bool> localePathsEncountered= new Dictionary<int, bool>();
         private readonly GridMap map;
 
         public GridMapEvaluator(GridMap map)
@@ -37,7 +37,7 @@ namespace Map
 
         public void EvaluatePathsFromLocale(Locale locale)
         {
-            if (bestLocalePaths.ContainsKey(locale.Index))
+            if (localePathsEncountered.ContainsKey(locale.Index))
             {
                 return;
             }
@@ -54,7 +54,7 @@ namespace Map
 
         private void EvaluatePath(Locale assessLocale, MapPath currentMapPath)
         {   
-            if (bestLocalePaths.ContainsKey(assessLocale.Index))
+            /*if (bestLocalePaths.ContainsKey(assessLocale.Index))
             {
                 var bestLocalePath = bestLocalePaths[assessLocale.Index];
                 currentMapPath.Length += bestLocalePath.Length;
@@ -62,15 +62,15 @@ namespace Map
                 AssessPath(currentMapPath);
                 ConfigureBestLocalePath(currentMapPath);
                 return;
-            }
-
+            }*/
+            localePathsEncountered[assessLocale.Index] = true;
             var viableNeighbours = map.GetViableNeighbours(assessLocale);
             if ((viableNeighbours == null) || (viableNeighbours.Count == 0))
             {
+                currentMapPath.Length++;
                 currentMapPath.End = assessLocale;
                 AssessPath(currentMapPath);
-                ConfigureBestLocalePath(currentMapPath);
-                
+                //ConfigureBestLocalePath(currentMapPath);                
                 return;
             }
 
@@ -83,17 +83,17 @@ namespace Map
                     Length = currentMapPath.Length
                 };
                 EvaluatePath(viableNeighbour, path);
-                var pathFromNeighbour = new MapPath
+                /*var pathFromNeighbour = new MapPath
                 {
                     Start = viableNeighbour,
                     End = path.End,
                     Length = path.Length- currentMapPath.Length
                 };
-                //ConfigureBestLocalePath(pathFromNeighbour);
+                ConfigureBestLocalePath(pathFromNeighbour);*/
             }
         }
 
-        private void ConfigureBestLocalePath(MapPath path)
+        /*private void ConfigureBestLocalePath(MapPath path)
         {
             var locale = path.Start;
             if ((!bestLocalePaths.ContainsKey(locale.Index))
@@ -103,7 +103,7 @@ namespace Map
                 bestLocalePaths[locale.Index] = path;
             }
 
-        }
+        }*/
 
         private void AssessPath(MapPath mapPath)
         {

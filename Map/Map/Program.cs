@@ -29,12 +29,6 @@ namespace Map
                 {
                     continue;
                 }
-
-                if (locale.Encountered)
-                {
-                    continue;
-                }
-
                 mapEvaluator.EvaluatePathsFromLocale(map.LocaleArray[i]);
             }
 
