@@ -6,40 +6,58 @@ using System.Threading.Tasks;
 
 namespace Map
 {
-    public class SquareMap
+    public class GridMap
     {
         public int[] MapArray => mapArray;
         public Locale[] LocaleArray => localeArray;
-        public int SideLength => sideLength;
+        public int XLength => xLength;
+        public int YLength => yLength;
 
-        private readonly int sideLength;
+        private readonly int xLength;
+        private readonly int yLength;
         private readonly int[] mapArray;
         private readonly Locale[] localeArray;
 
-        public SquareMap(string mapText, int sideLength)
+        public GridMap(List<string> mapLines)
         {
-            this.sideLength = sideLength;
-            int size = sideLength*sideLength;
+            if ((mapLines==null)||(mapLines.Count == 0))
+            {
+                throw new GridMapParseException("No map provided");
+            }
+            var dimensions = mapLines[0].Split(' ');
+            int x=0, y=0;
+            if ((!int.TryParse(dimensions[0], out x))||(x<=0))
+            {
+                throw new GridMapParseException("Invalid grid dimensions.");
+            }
+            if (!int.TryParse(dimensions[0], out y)||(y<=0))
+            {
+                throw new GridMapParseException("Invalid grid dimensions.");
+            }
+            xLength = x;
+            yLength = y;
+            int size = xLength*yLength;
             mapArray = new int[size];
             localeArray= new Locale[size];
-            mapText = mapText.Replace('\n', ' ');
-            string[] mapValues = mapText.Split(' ');
             int index = 0;
-            foreach(var value in mapValues)
+            for(int i=1; i < mapLines.Count; i++)
             {
-                int intValue;
-                if (int.TryParse(value, out intValue))
+                var line = mapLines[i].Split(' ');
+                for (int j = 0; j < line.Length; j++)
                 {
-                    mapArray[index] = intValue;
-                    localeArray[index] = new Locale
+                    int intValue;                 
+                    if (int.TryParse(line[j], out intValue))
                     {
-                        Index = index,
-                        Value = intValue
-                    };
-                    index++;
+                        mapArray[index] = intValue;
+                        localeArray[index] = new Locale
+                        {
+                            Index = index,
+                            Value = intValue
+                        };
+                        index++;
+                    }
                 }
             }
-
             localeArray = localeArray.OrderByDescending(l => l.Value).ToArray();
 
         }
@@ -52,12 +70,12 @@ namespace Map
 
         public int GetMapRow(int index)
         {
-            return (index /SideLength)+1;
+            return (index /XLength)+1;
         }
 
         public int GetMapColumn(int index)
         {
-            return (index % SideLength)+1;
+            return (index % XLength)+1;
         }
 
 
@@ -147,26 +165,26 @@ namespace Map
         }
         private int GetUp(int index)
         {
-            if (index >= sideLength)
+            if (index >= xLength)
             {
-                return index - sideLength;
+                return index - xLength;
             }
             return -1;
         }
 
         private int GetDown(int index)
         {
-            int lastRowBoundary = sideLength * (sideLength - 1);
+            int lastRowBoundary = xLength * (yLength - 1);
             if (index < lastRowBoundary)
             {
-                return index + sideLength;
+                return index + xLength;
             }
             return -1;
         }
 
         private int GetLeft(int index)
         {
-            if ((index % sideLength) != 0)
+            if ((index % xLength) != 0)
             {
                 return index - 1;
             }
@@ -175,7 +193,7 @@ namespace Map
 
         private int GetRight(int index)
         {
-            if ((index % sideLength) != (sideLength - 1))
+            if ((index % xLength) != (xLength - 1))
             {
                 return index + 1;
             }
@@ -183,9 +201,9 @@ namespace Map
         }
     }
 
-    public class SquareMapParseException : Exception
+    public class GridMapParseException : Exception
     {
-        public SquareMapParseException() : base("An invalid value has ruined the squareness of your map!!!!")
+        public GridMapParseException(string message) : base(message)
         {
 
         }

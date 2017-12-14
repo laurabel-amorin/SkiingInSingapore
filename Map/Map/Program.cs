@@ -12,29 +12,36 @@ namespace Map
     {
         static void Main(string[] args)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            
             string directory = Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory()));
-            string text = File.ReadAllText(directory+@"\map.txt");
-            var map = new SquareMap(text, 1000);
-            Console.WriteLine($"You have successfully created a {map.SideLength}x{map.SideLength} square map");
+            var text = File.ReadLines(directory+@"\map.txt").ToList();
+            var map = new GridMap(text);
+            Console.WriteLine($"You have successfully created a {map.XLength}x{map.XLength} grid map");
 
-            List<int> encounteredIndices = new List<int>();
-            var mapEvaluator= new SquareMapEvaluator(map);
+            var mapEvaluator= new GridMapEvaluator(map);
             Console.WriteLine();
             Console.WriteLine("Working...");
-            foreach (var locale in map.LocaleArray)
+            for(int i=0; i<map.LocaleArray.Length; i++)
             {
-                if (encounteredIndices.Contains(locale.Index))
-                {
-                    continue;
-                }
+                var locale = map.LocaleArray[i];
                 if (locale.Value == 0)
                 {
                     continue;
                 }
-                mapEvaluator.EvaluatePathsFromLocale(locale);
+
+                if (locale.Encountered)
+                {
+                    continue;
+                }
+
+                mapEvaluator.EvaluatePathsFromLocale(map.LocaleArray[i]);
             }
 
             mapEvaluator.DisplayResults();
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            Console.WriteLine($"ExecutionTime: {elapsedMs/1000.0} seconds");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
         }

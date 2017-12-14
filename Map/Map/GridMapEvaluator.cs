@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Map
 {
-    class SquareMapEvaluator
+    class GridMapEvaluator
     {
         private MapPath BestMapPath { get; set; }= new MapPath();
+        private Dictionary<int, MapPath> bestLocalePaths= new Dictionary<int, MapPath>();
+        private readonly GridMap map;
 
-        private List<int> encountered= new List<int>();
-
-        private readonly SquareMap map;
-
-        public SquareMapEvaluator(SquareMap map)
+        public GridMapEvaluator(GridMap map)
         {
             this.map = map;
             BestMapPath = new MapPath();
@@ -38,6 +37,14 @@ namespace Map
 
         public void EvaluatePathsFromLocale(Locale locale)
         {
+            if (bestLocalePaths.ContainsKey(locale.Index))
+            {
+                return;
+            }
+            if ((locale.Value < BestMapPath.Length)||((locale.Value == BestMapPath.Length)&&(locale.Value<=BestMapPath.VerticalDrop)))
+            {
+                return;
+            }            
             var currentPath = new MapPath
             {
                 Start = locale
@@ -46,26 +53,56 @@ namespace Map
         }
 
         private void EvaluatePath(Locale assessLocale, MapPath currentMapPath)
-        {
-            encountered.Add(assessLocale.Index);
+        {   
+            if (bestLocalePaths.ContainsKey(assessLocale.Index))
+            {
+                var bestLocalePath = bestLocalePaths[assessLocale.Index];
+                currentMapPath.Length += bestLocalePath.Length;
+                currentMapPath.End = bestLocalePath.End;
+                AssessPath(currentMapPath);
+                ConfigureBestLocalePath(currentMapPath);
+                return;
+            }
+
             var viableNeighbours = map.GetViableNeighbours(assessLocale);
             if ((viableNeighbours == null) || (viableNeighbours.Count == 0))
             {
                 currentMapPath.End = assessLocale;
                 AssessPath(currentMapPath);
+                ConfigureBestLocalePath(currentMapPath);
+                
                 return;
             }
 
             currentMapPath.Length++;
-            foreach (var viableNeighbour in viableNeighbours)
+            foreach(var viableNeighbour in viableNeighbours)
             {
-                var path = new MapPath
+                 var path = new MapPath
                 {
                     Start = currentMapPath.Start,
                     Length = currentMapPath.Length
                 };
                 EvaluatePath(viableNeighbour, path);
+                var pathFromNeighbour = new MapPath
+                {
+                    Start = viableNeighbour,
+                    End = path.End,
+                    Length = path.Length- currentMapPath.Length
+                };
+                //ConfigureBestLocalePath(pathFromNeighbour);
             }
+        }
+
+        private void ConfigureBestLocalePath(MapPath path)
+        {
+            var locale = path.Start;
+            if ((!bestLocalePaths.ContainsKey(locale.Index))
+                || (bestLocalePaths[locale.Index].Length < path.Length)
+                || ((bestLocalePaths[locale.Index].Length == path.Length) && (bestLocalePaths[locale.Index].VerticalDrop < path.VerticalDrop)))
+            {
+                bestLocalePaths[locale.Index] = path;
+            }
+
         }
 
         private void AssessPath(MapPath mapPath)
