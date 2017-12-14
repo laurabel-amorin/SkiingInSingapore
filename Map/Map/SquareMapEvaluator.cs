@@ -29,8 +29,8 @@ namespace Map
             Console.WriteLine();
             Console.WriteLine("RESULTS:");
             Console.WriteLine($"Path length: {BestMapPath.Length}");
-            Console.WriteLine($"Start at:{BestMapPath.Start.Value} in row {map.GetMapRow(BestMapPath.Start.Index)} column {map.GetMapColumn(BestMapPath.Start.Index)}");
-            Console.WriteLine($"End at:{BestMapPath.End.Value} in row {map.GetMapRow(BestMapPath.End.Index)} column {map.GetMapColumn(BestMapPath.End.Index)}");
+            //Console.WriteLine($"Start at:{BestMapPath.Start.Value} in row {map.GetMapRow(BestMapPath.Start.Index)} column {map.GetMapColumn(BestMapPath.Start.Index)}");
+            //Console.WriteLine($"End at:{BestMapPath.End.Value} in row {map.GetMapRow(BestMapPath.End.Index)} column {map.GetMapColumn(BestMapPath.End.Index)}");
             Console.WriteLine($"Vertical Drop: {BestMapPath.VerticalDrop}");
             Console.WriteLine($"Email: {BestMapPath.Length}{BestMapPath.VerticalDrop}@redmart.com");
             Console.WriteLine();
